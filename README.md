@@ -41,7 +41,7 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/<your-username>/springboot-security-app.git
+git clone git@github.com:dikshyant07/springboot-security-app.git
 cd springboot-security-app
  ```
 2.📄 Configure application-prod.yml
