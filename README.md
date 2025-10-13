@@ -4,7 +4,7 @@
 
 ---
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - **Spring Boot** – Application framework  
 - **Spring Security** – Authentication & Authorization  
@@ -18,7 +18,7 @@
 
 ---
 
-## ⚙️ Features
+##  Features
 
 - JWT-based authentication with access and refresh tokens
 - Fine-grained role-based authorization
@@ -34,7 +34,7 @@
 
 
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -49,7 +49,7 @@
 git clone git@github.com:dikshyant07/springboot-security-app.git
 cd springboot-security-app
  ```
-2.📄 Configure application-prod.yml
+2. Configure application-prod.yml
 
 Before running the project, open src/main/resources/application-prod.yml and update the default placeholder values with your local settings. 
 ```bash
