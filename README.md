@@ -20,14 +20,22 @@
 
 ## ⚙️ Features
 
-- JWT-based authentication with access and refresh tokens  
-- Fine-grained role-based authorization  
-- Permissions system for granular access control  
-- Input validation for secure API requests  
-- Unit tests with Mockito for service layer  
-- Configurable profiles (`dev` and `prod`) with safe environment variables  
+## Features
 
----
+## Features
+
+- JWT-based authentication with access and refresh tokens
+- Fine-grained role-based authorization
+- Permissions system for granular access control
+- Input validation for secure API requests
+- Unit tests for the service layer using Mockito
+- Configurable profiles (`dev` and `prod`) with safe environment variables
+- Pagination support for admin APIs (e.g., list users in pages)
+- Sorting support for admin APIs (e.g., sort users by name, role, or creation date)
+- Swagger integration for API testing and documentation
+
+
+---s
 
 ## 🚀 Getting Started
 
@@ -100,4 +108,16 @@ utils:
 2. Update admin/manager emails and passwords as needed.
 3. Change the JWT secret to a strong random value.
 4. Save the file.
+
+## How to Access Swagger UI(For API testing and documentation)
+
+1. Launch the Spring Boot application using:
+
+```bash
+./mvnw spring-boot:run
+```
+Open your web browser and navigate to:
+```bash
+http://localhost:8090/swagger-ui/index.html
+```
 
