@@ -1,0 +1,45 @@
+logging:
+  level:
+    root: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/security_project_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+utils:
+  admin:
+    name: ${ADMIN_NAME:Dikshanta Acharya}
+    age: ${ADMIN_AGE:20}
+    gender: ${ADMIN_GENDER:MALE}
+    email: ${ADMIN_EMAIL:example@gmail.com}
+    password: ${ADMIN_PASSWORD:admin123}
+
+  manager:
+    name: ${MANAGER_NAME:Pratik Kattel}
+    age: ${MANAGER_AGE:20}
+    gender: ${MANAGER_GENDER:MALE}
+    email: ${MANAGER_EMAIL:manager@example.com}
+    password: ${MANAGER_PASSWORD:manager123}
+
+  jwt:
+    secret: ${JWT_SECRET:qD8rT5Wkz7mVn2Xy9B1hC4pR6aF0dJ8uE3sL9tY2wM5nH7gK0bZ4vP6qR8sD1fA3}
+    expiry: ${JWT_EXPIRY:30}

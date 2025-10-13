@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: security_project
+  profiles:
+    active: prod
+server:
+  port: 8090

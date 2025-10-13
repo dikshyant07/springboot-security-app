@@ -1,0 +1,42 @@
+# Build
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+*.log
+logs/
+spring.log
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+.vscode/
+.nb-gradle/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and local configs
+.env
+.env.*
+*.env
+
+# Sensitive or local YAML configs
+src/main/resources/application-dev.yml
+
