@@ -20,10 +20,6 @@
 
 ## ⚙️ Features
 
-## Features
-
-## Features
-
 - JWT-based authentication with access and refresh tokens
 - Fine-grained role-based authorization
 - Permissions system for granular access control
