@@ -29,9 +29,10 @@
 - Pagination support for admin APIs (e.g., list users in pages)
 - Sorting support for admin APIs (e.g., sort users by name, role, or creation date)
 - Swagger integration for API testing and documentation
+- Basic crud operations by admins.
 
 
----s
+
 
 ## 🚀 Getting Started
 
