@@ -46,7 +46,7 @@ cd springboot-security-app
  ```
 2.📄 Configure application-prod.yml
 
-Before running the project, open src/main/resources/application-prod.yml and update the default placeholder values with your local settings. This file is already committed and safe to edit.
+Before running the project, open src/main/resources/application-prod.yml and update the default placeholder values with your local settings. 
 ```bash
 logging:
   level:
