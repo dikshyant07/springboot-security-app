@@ -7,6 +7,7 @@ import com.authentication.system.security_project.dtos.SignupResponseDto;
 import com.authentication.system.security_project.enums.Gender;
 import com.authentication.system.security_project.enums.Role;
 import com.authentication.system.security_project.exceptions.AdminDoesnotExistsException;
+import com.authentication.system.security_project.exceptions.NotAnAdminException;
 import com.authentication.system.security_project.exceptions.PasswordCompromisedException;
 import com.authentication.system.security_project.exceptions.UserAlreadyExistsException;
 import com.authentication.system.security_project.mappers.UserMapper;
@@ -202,6 +203,25 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldThrowNotAnAdminException() {
+        AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
+                                                   .email("johndoe1234@gmail.com")
+                                                   .password("@Johndoe9898").build();
+        User user = User.builder()
+                        .id(1L)
+                        .name("John Doe")
+                        .age(20)
+                        .gender(Gender.MALE)
+                        .email("johndoe1234@gmail.com")
+                        .password("encodedPassword")
+                        .role(Role.USER)
+                        .build();
+        when(userRepository.findByEmail(updateDto.getEmail())).thenReturn(Optional.of(user));
+        Assertions.assertThrows(NotAnAdminException.class, () -> userService.updateAdmin(updateDto));
+
+    }
+
+    @Test
     void shouldUpdateTheManagerIfManagerExists() {
         AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
                                                    .email("johndoe1234@gmail.com")
@@ -252,5 +272,60 @@ class UserServiceTest {
         verify(userMapper).toAdminUpdateDto(any(User.class));
     }
 
+    @Test
+    void shouldCreateManager() {
+        SignupDto signupDto = SignupDto.builder()
+                                       .name("John Doe")
+                                       .age(25)
+                                       .gender("MALE")
+                                       .email("john.doe@example.com")
+                                       .password("StrongP@ssword123")
+                                       .build();
+        User mappedUser = User.builder()
+                              .name(signupDto.getName())
+                              .age(signupDto.getAge())
+                              .gender(Gender.valueOf(signupDto.getGender()))
+                              .email(signupDto.getEmail())
+                              .password(signupDto.getPassword())
+                              .build();
 
+        User savedUser = User.builder()
+                             .id(1L)
+                             .name(signupDto.getName())
+                             .age(signupDto.getAge())
+                             .gender(Gender.valueOf(signupDto.getGender()))
+                             .email(signupDto.getEmail())
+                             .password("encodedPassword")
+                             .role(Role.MANAGER)
+                             .build();
+
+        SignupResponseDto responseDto = SignupResponseDto.builder()
+                                                         .userId(1L)
+                                                         .name(savedUser.getName())
+                                                         .age(savedUser.getAge())
+                                                         .gender(savedUser.getGender().name())
+                                                         .role(savedUser.getRole())
+                                                         .email(savedUser.getEmail())
+                                                         .build();
+        when(userRepository.existsByEmail(signupDto.getEmail())).thenReturn(false);
+        when(userMapper.toUser(signupDto)).thenReturn(mappedUser);
+        when(passwordEncoder.encode(signupDto.getPassword())).thenReturn("encodedPassword");
+        when(userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(savedUser);
+        when(userMapper.toDto(savedUser)).thenReturn(responseDto);
+
+        SignupResponseDto signupResponseDto = userService.createAccount(signupDto);
+
+        Assertions.assertNotNull(signupResponseDto);
+        Assertions.assertEquals(savedUser.getId(), signupResponseDto.getUserId());
+        Assertions.assertEquals(savedUser.getName(), signupResponseDto.getName());
+        Assertions.assertEquals(savedUser.getEmail(), signupResponseDto.getEmail());
+        Assertions.assertEquals(savedUser.getRole(), signupResponseDto.getRole());
+        Assertions.assertEquals(savedUser.getGender().name(), signupResponseDto.getGender());
+
+        verify(userRepository).existsByEmail(signupDto.getEmail());
+        verify(userMapper).toUser(signupDto);
+        verify(passwordEncoder).encode(signupDto.getPassword());
+        verify(userRepository).save(any(User.class));
+
+    }
 }
