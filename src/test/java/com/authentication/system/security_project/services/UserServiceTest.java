@@ -6,6 +6,8 @@ import com.authentication.system.security_project.dtos.SignupDto;
 import com.authentication.system.security_project.dtos.SignupResponseDto;
 import com.authentication.system.security_project.enums.Gender;
 import com.authentication.system.security_project.enums.Role;
+import com.authentication.system.security_project.exceptions.AdminDoesnotExistsException;
+import com.authentication.system.security_project.exceptions.PasswordCompromisedException;
 import com.authentication.system.security_project.exceptions.UserAlreadyExistsException;
 import com.authentication.system.security_project.mappers.UserMapper;
 import com.authentication.system.security_project.models.User;
@@ -133,7 +135,7 @@ class UserServiceTest {
                                 .gender(Gender.MALE)
                                 .email("johndoe1234@gmail.com")
                                 .password("newEncodedPassword")
-                                .role(Role.USER)
+                                .role(Role.ADMIN)
                                 .build();
         AdminsUpdateResponseDto responseDto = AdminsUpdateResponseDto.builder()
                                                                      .name(updatedAdmin.getName())
@@ -147,7 +149,8 @@ class UserServiceTest {
         when(passwordEncoder.matches(updateDto.getPassword(), admin.getPassword())).thenReturn(false);
         when(passwordEncoder.encode(updateDto.getPassword())).thenReturn(updatedAdmin.getPassword());
         when(userRepository.save(any(User.class))).thenReturn(updatedAdmin);
-        when(userMapper.toAdminUpdateDto(updatedAdmin)).thenReturn(responseDto);
+        when(userMapper.toAdminUpdateDto(any(User.class))).thenReturn(responseDto);
+
 
         AdminsUpdateResponseDto adminsUpdateResponseDto = userService.updateAdmin(updateDto);
         Assertions.assertNotNull(adminsUpdateResponseDto);
@@ -159,8 +162,95 @@ class UserServiceTest {
         Assertions.assertEquals(responseDto.getRole(), adminsUpdateResponseDto.getRole());
 
         verify(userRepository).findByEmail(updateDto.getEmail());
-        verify(passwordEncoder).matches(updateDto.getPassword(), admin.getPassword());
         verify(passwordEncoder).encode(updateDto.getPassword());
+        verify(userRepository).save(any(User.class));
+        verify(userMapper).toAdminUpdateDto(any(User.class));
     }
+
+    @Test
+    void shouldThrowAdminDoesNotExistsException() {
+        AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
+                                                   .email("johndoe1234@gmail.com")
+                                                   .password("@Johndoe9898").build();
+        when(userRepository.findByEmail(updateDto.getEmail())).thenThrow(new AdminDoesnotExistsException("Admin with this email does not exists"));
+        Assertions.assertThrows(AdminDoesnotExistsException.class, () -> userService.updateAdmin(updateDto));
+        verify(userRepository).findByEmail(updateDto.getEmail());
+    }
+
+    @Test
+    void shouldThrowPasswordCompromisedExceptionIfSamePassword() {
+        AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
+                                                   .email("johndoe1234@gmail.com")
+                                                   .password("@Johndoe9898").build();
+        User admin = User.builder()
+                         .id(1L)
+                         .name("John Doe")
+                         .age(20)
+                         .gender(Gender.MALE)
+                         .email("johndoe1234@gmail.com")
+                         .password("encodedPassword")
+                         .role(Role.ADMIN)
+                         .build();
+        when(userRepository.findByEmail(updateDto.getEmail())).thenReturn(Optional.of(admin));
+        when(passwordEncoder.matches(updateDto.getPassword(), admin.getPassword())).thenReturn(true);
+
+        Assertions.assertThrows(PasswordCompromisedException.class, () -> userService.updateAdmin(updateDto));
+
+        verify(userRepository).findByEmail(updateDto.getEmail());
+        verify(passwordEncoder).matches(updateDto.getPassword(), admin.getPassword());
+
+    }
+
+    @Test
+    void shouldUpdateTheManagerIfManagerExists() {
+        AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
+                                                   .email("johndoe1234@gmail.com")
+                                                   .password("@Johndoe9898").build();
+        User manager = User.builder()
+                           .id(1L)
+                           .name("John Doe")
+                           .age(20)
+                           .gender(Gender.MALE)
+                           .email("johndoe1234@gmail.com")
+                           .password("encodedPassword")
+                           .role(Role.MANAGER)
+                           .build();
+        User updatedManager = User.builder()
+                                  .id(1L)
+                                  .name("John Doe")
+                                  .age(20)
+                                  .gender(Gender.MALE)
+                                  .email("johndoe1234@gmail.com")
+                                  .password("newEncodedPassword")
+                                  .role(Role.MANAGER)
+                                  .build();
+        AdminsUpdateResponseDto responseDto = AdminsUpdateResponseDto.builder()
+                                                                     .name(updatedManager.getName())
+                                                                     .age(updatedManager.getAge())
+                                                                     .gender(updatedManager.getGender().name())
+                                                                     .email(updatedManager.getEmail())
+
+                                                                     .role(updatedManager.getRole()).build();
+        when(userRepository.findByEmail(updateDto.getEmail())).thenReturn(Optional.of(manager));
+        when(passwordEncoder.matches(updateDto.getPassword(), manager.getPassword())).thenReturn(false);
+        when(passwordEncoder.encode(updateDto.getPassword())).thenReturn(updatedManager.getPassword());
+        when(userRepository.save(any(User.class))).thenReturn(updatedManager);
+        when(userMapper.toAdminUpdateDto(any(User.class))).thenReturn(responseDto);
+
+        AdminsUpdateResponseDto adminsUpdateResponseDto = userService.updateManager(updateDto);
+
+        Assertions.assertNotNull(adminsUpdateResponseDto);
+        Assertions.assertEquals(responseDto.getName(), adminsUpdateResponseDto.getName());
+        Assertions.assertEquals(responseDto.getAge(), adminsUpdateResponseDto.getAge());
+        Assertions.assertEquals(responseDto.getGender(), adminsUpdateResponseDto.getGender());
+        Assertions.assertEquals(responseDto.getEmail(), adminsUpdateResponseDto.getEmail());
+        Assertions.assertEquals(responseDto.getRole(), adminsUpdateResponseDto.getRole());
+
+        verify(userRepository).findByEmail(updateDto.getEmail());
+        verify(passwordEncoder).encode(updateDto.getPassword());
+        verify(userRepository).save(any(User.class));
+        verify(userMapper).toAdminUpdateDto(any(User.class));
+    }
+
 
 }
