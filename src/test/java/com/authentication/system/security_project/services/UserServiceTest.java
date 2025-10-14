@@ -1,5 +1,7 @@
 package com.authentication.system.security_project.services;
 
+import com.authentication.system.security_project.dtos.AdminsUpdateDto;
+import com.authentication.system.security_project.dtos.AdminsUpdateResponseDto;
 import com.authentication.system.security_project.dtos.SignupDto;
 import com.authentication.system.security_project.dtos.SignupResponseDto;
 import com.authentication.system.security_project.enums.Gender;
@@ -17,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -106,6 +110,57 @@ class UserServiceTest {
 
         verify(userRepository).existsByEmail(signupDto.getEmail());
 
+    }
+
+    @Test
+    void shouldUpdateTheAdminIfTheUserWithGivenEmailIsAdmin() {
+        AdminsUpdateDto updateDto = AdminsUpdateDto.builder()
+                                                   .email("johndoe1234@gmail.com")
+                                                   .password("@Johndoe9898").build();
+        User admin = User.builder()
+                         .id(1L)
+                         .name("John Doe")
+                         .age(20)
+                         .gender(Gender.MALE)
+                         .email("johndoe1234@gmail.com")
+                         .password("encodedPassword")
+                         .role(Role.ADMIN)
+                         .build();
+        User updatedAdmin = User.builder()
+                                .id(1L)
+                                .name("John Doe")
+                                .age(20)
+                                .gender(Gender.MALE)
+                                .email("johndoe1234@gmail.com")
+                                .password("newEncodedPassword")
+                                .role(Role.USER)
+                                .build();
+        AdminsUpdateResponseDto responseDto = AdminsUpdateResponseDto.builder()
+                                                                     .name(updatedAdmin.getName())
+                                                                     .age(updatedAdmin.getAge())
+                                                                     .gender(updatedAdmin.getGender().name())
+                                                                     .email(updatedAdmin.getEmail())
+                                                                     .role(updatedAdmin.getRole()).build();
+
+
+        when(userRepository.findByEmail(updateDto.getEmail())).thenReturn(Optional.of(admin));
+        when(passwordEncoder.matches(updateDto.getPassword(), admin.getPassword())).thenReturn(false);
+        when(passwordEncoder.encode(updateDto.getPassword())).thenReturn(updatedAdmin.getPassword());
+        when(userRepository.save(any(User.class))).thenReturn(updatedAdmin);
+        when(userMapper.toAdminUpdateDto(updatedAdmin)).thenReturn(responseDto);
+
+        AdminsUpdateResponseDto adminsUpdateResponseDto = userService.updateAdmin(updateDto);
+        Assertions.assertNotNull(adminsUpdateResponseDto);
+
+        Assertions.assertEquals(responseDto.getName(), adminsUpdateResponseDto.getName());
+        Assertions.assertEquals(responseDto.getAge(), adminsUpdateResponseDto.getAge());
+        Assertions.assertEquals(responseDto.getGender(), adminsUpdateResponseDto.getGender());
+        Assertions.assertEquals(responseDto.getEmail(), adminsUpdateResponseDto.getEmail());
+        Assertions.assertEquals(responseDto.getRole(), adminsUpdateResponseDto.getRole());
+
+        verify(userRepository).findByEmail(updateDto.getEmail());
+        verify(passwordEncoder).matches(updateDto.getPassword(), admin.getPassword());
+        verify(passwordEncoder).encode(updateDto.getPassword());
     }
 
 }
