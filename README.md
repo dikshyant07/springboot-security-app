@@ -27,7 +27,7 @@
 - Unit tests for the service layer using Mockito
 - Configurable profiles (`dev` and `prod`) with safe environment variables
 - Pagination support for admin API
-- Sorting support for admin APIs (e.g., sort users by name, role, or creation date)
+- Sorting and Pagination support for admin API
 - Swagger integration for API testing and documentation
 - Basic crud operations by admins.
 
