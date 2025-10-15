@@ -21,6 +21,7 @@
 ##  Features
 
 - JWT-based authentication with access and refresh tokens
+- Global level Exception Handling 
 - Fine-grained role-based authorization
 - Permissions system for granular access control
 - Input validation for secure API requests
